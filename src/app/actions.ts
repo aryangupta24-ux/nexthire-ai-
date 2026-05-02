@@ -26,7 +26,7 @@ export async function enhanceTextWithAI(text: string, type: string) {
       contents: prompt,
     });
 
-    return response.text;
+    return response.text || "";
   } catch (error) {
     console.error("AI Enhancement failed:", error);
     throw new Error("Failed to enhance text.");
