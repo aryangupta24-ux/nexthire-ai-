@@ -1,9 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
+const getApiKey = () => process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
 export async function enhanceTextWithAI(text: string, type: string) {
+  const apiKey = getApiKey();
   // Check if API key exists, otherwise mock
-  if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-    console.warn("NEXT_PUBLIC_GEMINI_API_KEY not found. Returning mock data.");
+  if (!apiKey) {
+    console.warn("Gemini API key not found. Returning mock data.");
     await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
     if (type === "summary") {
       return "Experienced professional with a proven track record of delivering high-quality solutions. " + text;
@@ -12,7 +15,7 @@ export async function enhanceTextWithAI(text: string, type: string) {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     
     let prompt = "";
     if (type === "summary") {
@@ -34,13 +37,14 @@ export async function enhanceTextWithAI(text: string, type: string) {
 }
 
 export async function chatWithCoach(message: string, history: { role: 'user' | 'model', content: string }[] = []) {
-  if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     await new Promise(resolve => setTimeout(resolve, 1500));
-    return "I am your AI Coach! However, my API key is not configured, so I can only send this mock response right now. Please add your NEXT_PUBLIC_GEMINI_API_KEY to the environment.";
+    return "I am your AI Coach! However, my API key is not configured, so I can only send this mock response right now. Please add your GEMINI_API_KEY to the environment.";
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     
     // Format history for Gemini
     const contents: any[] = history.map(msg => ({
@@ -72,3 +76,4 @@ export async function chatWithCoach(message: string, history: { role: 'user' | '
     throw new Error("Failed to communicate with AI Coach.");
   }
 }
+
