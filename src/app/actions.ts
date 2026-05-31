@@ -32,3 +32,43 @@ export async function enhanceTextWithAI(text: string, type: string) {
     throw new Error("Failed to enhance text.");
   }
 }
+
+export async function chatWithCoach(message: string, history: { role: 'user' | 'model', content: string }[] = []) {
+  if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return "I am your AI Coach! However, my API key is not configured, so I can only send this mock response right now. Please add your NEXT_PUBLIC_GEMINI_API_KEY to the environment.";
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
+    
+    // Format history for Gemini
+    const contents: any[] = history.map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }]
+    }));
+    
+    // Add the current message
+    contents.push({
+      role: 'user',
+      parts: [{ text: message }]
+    });
+
+    // Add a system prompt conceptually as the first message or let Gemini know its persona
+    const systemPrompt = "You are a professional AI Career Coach and Interview Trainer for NextHire AI. Your goal is to help candidates improve their resumes, prepare for interviews, and land their dream jobs. Keep your answers concise, actionable, and encouraging.";
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        { role: 'user', parts: [{ text: `System Instruction: ${systemPrompt}` }] },
+        { role: 'model', parts: [{ text: "Understood. I am ready to coach." }] },
+        ...contents
+      ],
+    });
+
+    return response.text || "I'm sorry, I couldn't process that request.";
+  } catch (error) {
+    console.error("AI Coach failed:", error);
+    throw new Error("Failed to communicate with AI Coach.");
+  }
+}

@@ -6,36 +6,19 @@ import ResumeForm from "@/components/ResumeForm";
 import LivePreview from "@/components/LivePreview";
 import { Sparkles, Download, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 export default function BuilderPage() {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [isExporting, setIsExporting] = useState(false);
   const [atsScore, setAtsScore] = useState<number | null>(null);
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = () => {
     setIsExporting(true);
-    const element = document.getElementById("resume-preview");
-    if (!element) {
+    // Use native window.print() which allows for selectable text and ATS compatibility
+    setTimeout(() => {
+      window.print();
       setIsExporting(false);
-      return;
-    }
-    
-    try {
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${resumeData.personalInfo.fullName || "resume"}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    } finally {
-      setIsExporting(false);
-    }
+    }, 500);
   };
 
   const calculateAtsScore = () => {
@@ -52,7 +35,7 @@ export default function BuilderPage() {
   return (
     <div className="min-h-screen flex flex-col h-screen overflow-hidden bg-background">
       {/* Header */}
-      <header className="px-6 py-4 flex items-center justify-between glass z-10 shrink-0 border-b border-border/50">
+      <header className="print:hidden px-6 py-4 flex items-center justify-between glass z-10 shrink-0 border-b border-border/50">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="text-primary w-6 h-6" />
           <span className="font-bold text-xl tracking-tight">NextHire AI</span>
@@ -82,12 +65,12 @@ export default function BuilderPage() {
       {/* Main Workspace */}
       <main className="flex-1 flex overflow-hidden">
         {/* Form Panel */}
-        <section className="w-full md:w-1/2 h-full overflow-y-auto p-6 border-r border-border/50 custom-scrollbar">
+        <section className="print:hidden w-full md:w-1/2 h-full overflow-y-auto p-6 border-r border-border/50 custom-scrollbar">
           <ResumeForm data={resumeData} onChange={setResumeData} />
         </section>
 
         {/* Preview Panel */}
-        <section className="hidden md:flex w-1/2 h-full overflow-y-auto p-8 bg-muted/10 custom-scrollbar justify-center items-start">
+        <section className="print:block print:w-full print:p-0 print:bg-white hidden md:flex w-1/2 h-full overflow-y-auto p-8 bg-muted/10 custom-scrollbar justify-center items-start">
           <LivePreview data={resumeData} />
         </section>
       </main>

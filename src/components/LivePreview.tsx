@@ -4,7 +4,7 @@ export default function LivePreview({ data }: { data: ResumeData }) {
   return (
     <div 
       id="resume-preview" 
-      className="bg-white text-black w-full max-w-[210mm] min-h-[297mm] p-10 shadow-2xl origin-top"
+      className="bg-white text-black w-full max-w-[210mm] min-h-[297mm] p-10 shadow-2xl origin-top print:shadow-none print:w-[210mm] print:min-h-[297mm] print:max-w-none print:m-0"
       style={{ aspectRatio: "210/297" }}
     >
       {/* Header Info */}

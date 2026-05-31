@@ -22,7 +22,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-background text-foreground bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-background to-background relative selection:bg-primary/30">
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground relative selection:bg-primary/30">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
         {children}
       </body>
